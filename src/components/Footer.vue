@@ -1,10 +1,7 @@
 <template>
-  <div class="main-page-footer">
-    <button class="reset-likes" @click="resetLikes()"> Reset likes</button>
-    <footer>
-      <p id="copyRight">@2025 University of Tartu</p>
-    </footer>
-  </div>
+  <footer>
+    <p id="copyRight">@2025 University of Tartu</p>
+  </footer>
 </template>
 
 <script setup>
@@ -18,12 +15,6 @@ function resetLikes() {
 </script>
 
 <style scoped>
-.main-page-footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
 
 footer {
   background-color: lightgray;
@@ -34,13 +25,6 @@ footer {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.reset-likes {
-  background-color: #a6bbe4;
-  border: none;
-  padding: 4px 9px;
-  border-radius: 15px;
-  cursor: pointer;
-}
 
 #copyRight {
   text-decoration: underline;

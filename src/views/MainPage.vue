@@ -7,6 +7,9 @@
             :post="post"/>
     </div>
   </div>
+  <div>
+    <button class="reset-likes" @click="resetLikes()"> Reset likes</button>
+  </div>
 </template>
 
 <script setup>
@@ -27,6 +30,14 @@ onMounted(() => {
   flex-direction: column;
   max-width: 70%;
   margin: 0 auto;
+}
+
+.reset-likes {
+  background-color: #a6bbe4;
+  border: none;
+  padding: 4px 9px;
+  border-radius: 15px;
+  cursor: pointer;
 }
 
 @media (max-width: 768px) {
