@@ -1,6 +1,6 @@
 <template>
   <div class="main-page">
-    <h1>Main Page</h1>
+    <h1>Welcome to PostIt</h1>
     <div class="post-container">
       <post v-for="post in allPosts"
             :key="post.id"
@@ -25,9 +25,17 @@ onMounted(() => {
 .post-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  max-width: 500px;
+  max-width: 70%;
   margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .post-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    margin: 0 auto;
+  }
 }
 
 </style>

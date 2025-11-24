@@ -10,12 +10,27 @@ export default createStore({
     },
     mutations: {
         SET_POSTS(state, posts) {
-            state.posts = posts
+            state.posts = posts.map(post => ({
+                ...post,
+                isLiked: false
+            }))
         },
-        INCREMENT_LIKES(state, postId) {
+        TOGGLE_LIKE_BUTTON(state, postId) {
             const post = state.posts.find(p => p.id === postId);
             if (post) {
-                post.likes++;
+                post.isLiked = !post.isLiked;
+
+                if (post.isLiked) {
+                    post.likes++;
+                } else {
+                    post.likes--;
+                }
+            }
+        },
+        UNLIKE_ALL_POSTS(state) {
+            for (const post of state.posts) {
+                post.likes = 0;
+                post.isLiked = false;
             }
         }
     },
@@ -23,8 +38,11 @@ export default createStore({
         fetchPosts({commit}) {
             commit("SET_POSTS", postsData)
         },
-        likePost({commit}, postId) {
-            commit("INCREMENT_LIKES", postId)
+        toggleLike({commit}, postId) {
+            commit("TOGGLE_LIKE_BUTTON", postId)
+        },
+        unlikeAll({commit}) {
+            commit("UNLIKE_ALL_POSTS")
         }
     },
     modules: {}

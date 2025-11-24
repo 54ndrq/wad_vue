@@ -11,7 +11,11 @@ const props = defineProps({
 });
 
 function handleLike() {
-  store.dispatch("likePost", props.post.id);
+  store.dispatch("toggleLike", props.post.id);
+}
+
+function resetLikes() {
+  store.dispatch("unlikeAll");
 }
 
 </script>
@@ -28,10 +32,10 @@ function handleLike() {
       <div class="post-footer">
         <p class="post-comment">{{ post.title }}</p>
         <div class="like-section">
-          <button class="like-button" @click="handleLike">
+          <button :class="{'liked':post.isLiked}" class="like-button" @click="handleLike">
             <img alt="Like" class="like-image" src="@/assets/like.png">
           </button>
-          <p class="post-likes">{{ post.likes }}</p>
+          <p class="post-likes">{{ post.likes }} likes</p>
         </div>
       </div>
     </div>
@@ -94,17 +98,46 @@ img {
 .like-section {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  width: 100%;
 }
 
 .like-image {
   width: 36px;
   height: 36px;
   padding: 5px;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.like-button.liked .like-image {
+  width: 36px;
+  height: 36px;
+  padding: 5px;
+  opacity: 1;
   cursor: pointer;
 }
 
 .like-button {
   border: none;
   background-color: lightgray;
+}
+
+.post-likes {
+  margin-left: auto;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+
+  .user-info {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 5px 10px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
 }
 </style>
