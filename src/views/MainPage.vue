@@ -38,11 +38,15 @@ onMounted(() => {
 }
 
 .reset-likes {
-  background-color: #a6bbe4;
+  background: #557798;
   border: none;
   padding: 4px 9px;
   border-radius: 15px;
   cursor: pointer;
+}
+
+.reset-likes:hover {
+  background: #a6bbe4;
 }
 
 @media (max-width: 768px) {
