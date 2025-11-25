@@ -16,12 +16,12 @@
       <button type="submit" class="signup-btn">Sign up</button>
     </form>
 
-    <p v-if="errors.length" class="error">
+    <div v-if="errors.length" class="error">
       <strong>The password is not valid:</strong>
       <ul>
         <li v-for="(err, index) in errors" :key="index">{{ err }}</li>
       </ul>
-    </p>
+    </div>
   </div>
 </template>
 

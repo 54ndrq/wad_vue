@@ -20,11 +20,11 @@ function handleLike() {
   <div class="post">
     <div v-if="post">
       <div class="user-info">
-        <img class="profile-picture" src="@/assets/login.png">
+        <img alt="login_picture" class="profile-picture" src="@/assets/login.png">
         <p class="username">{{ post.username }}</p>
         <p class="post-date"> {{ post.date }}</p>
       </div>
-      <img v-if="post.image" :src="require(`@/assets/${post.image}`)" class="post-image">
+      <img alt = "post_picture" v-if="post.image" :src="require(`@/assets/${post.image}`)" class="post-image">
       <div class="post-footer">
         <p class="post-comment">{{ post.title }}</p>
         <div class="like-section">
