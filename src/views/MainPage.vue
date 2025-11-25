@@ -19,6 +19,11 @@ import {computed, onMounted} from "vue";
 
 const store = useStore();
 const allPosts = computed(() => store.getters.allPosts);
+
+function resetLikes() {
+  store.dispatch("unlikeAll");
+}
+
 onMounted(() => {
   store.dispatch("fetchPosts");
 });

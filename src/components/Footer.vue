@@ -8,10 +8,6 @@
 import {useStore} from "vuex";
 
 const store = useStore();
-
-function resetLikes() {
-  store.dispatch("unlikeAll");
-}
 </script>
 
 <style scoped>
