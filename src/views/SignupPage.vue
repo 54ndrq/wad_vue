@@ -47,9 +47,6 @@ export default {
       if (!/^[A-Z]/.test(pw)) {
         this.errors.push("Password must start with an uppercase letter");
       }
-      if (!/[A-Z]/.test(pw)) {
-        this.errors.push("Password must contain at least one uppercase letter");
-      }
       if ((pw.match(/[a-z]/g) || []).length < 2) {
         this.errors.push("Password must contain at least two lowercase letters");
       }
@@ -60,8 +57,13 @@ export default {
         this.errors.push("Password must include the character '_'");
       }
 
-      if (this.errors.length === 0) {
+      if (this.errors.length > 0) {
+        this.password = '';
+      } else {
         alert("Signup successful!");
+        //Clears the form
+        this.email = '';
+        this.password = '';
       }
     }
   }

@@ -14,10 +14,6 @@ function handleLike() {
   store.dispatch("toggleLike", props.post.id);
 }
 
-function resetLikes() {
-  store.dispatch("unlikeAll");
-}
-
 </script>
 
 <template>
