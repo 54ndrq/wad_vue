@@ -33,20 +33,24 @@ onMounted(() => {
 .post-container {
   display: flex;
   flex-direction: column;
-  max-width: 70%;
+  max-width: 900px;
   margin: 0 auto;
+  padding: 15px 0;
 }
 
 .reset-likes {
   background: #557798;
+  color: lightgray;
   border: none;
-  padding: 4px 9px;
+  padding: 5px 10px;
+  margin-bottom: 2%;
   border-radius: 15px;
   cursor: pointer;
 }
 
 .reset-likes:hover {
   background: #a6bbe4;
+  color: black;
 }
 
 @media (max-width: 768px) {
@@ -55,6 +59,14 @@ onMounted(() => {
     flex-direction: column;
     max-width: 100%;
     margin: 0 auto;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-container {
+    max-width: 100%;
+    padding: 8px;
   }
 }
 

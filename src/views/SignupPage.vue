@@ -75,7 +75,8 @@ export default {
   background: #f0f0f0;
   padding: 25px;
   border-radius: 12px;
-  width: 350px;
+  width: 100%;
+  max-width: 500px;
   margin: 40px auto;
   text-align: left;
   box-shadow: 0 0 10px #ccc;
@@ -98,6 +99,11 @@ input {
   border-radius: 6px;
 }
 
+input:focus {
+  border-color: #2a4977;
+  outline: none;
+}
+
 .signup-btn {
   margin-top: 12px;
   width: 100%;
@@ -117,7 +123,23 @@ input {
   margin-top: 15px;
   background: #ffe6e6;
   padding: 12px;
+  border: 1px solid #d9534f;
   border-radius: 6px;
-  color: red;
+  color: #d9534f;
+}
+
+@media (max-width: 600px) {
+  .signup-container {
+    width: 90%;
+    padding: 15px;
+  }
+
+  .signup-btn {
+    padding: 12px;
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+  }
 }
 </style>
