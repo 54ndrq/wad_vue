@@ -9,36 +9,41 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const SECRET = 'supersecretkey'; // ok for homework
+const SECRET = process.env.JWT_SECRET || 'supersecretkey';
 
 // PostgreSQL connection
 const pool = new Pool({
     user: process.env.DB_USER,
-    host: 'localhost',
+    host: process.env.DB_HOST || 'localhost',
     database: process.env.DB_NAME,
     password: process.env.DB_PASSWORD,
-    port: 5432,
+    port: parseInt(process.env.DB_PORT) || 5432,
 });
 
 // Create tables automatically
 (async () => {
-    await pool.query(`
-    CREATE TABLE IF NOT EXISTS users (
-      id SERIAL PRIMARY KEY,
-      email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL
-    );
-  `);
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                email TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL
+            );
+        `);
 
-    await pool.query(`
-    CREATE TABLE IF NOT EXISTS posts (
-      id SERIAL PRIMARY KEY,
-      body TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-  `);
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS posts (
+                id SERIAL PRIMARY KEY,
+                body TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
 
-    console.log('Tables ready');
+        console.log('Tables ready');
+    } catch (err) {
+        console.error('Error creating tables:', err);
+        process.exit(1);
+    }
 })();
 
 // JWT middleware
@@ -56,17 +61,20 @@ function authenticateToken(req, res, next) {
 
 // SIGNUP
 app.post('/signup', async (req, res) => {
-    const { email, password } = req.body;
-    const hashed = await bcrypt.hash(password, 10);
+    const email = req.body.email?.trim();
+    const password = req.body.password;
+
+    if (!email || !password) return res.status(400).json({ message: 'Email and password required' });
 
     try {
+        const hashed = await bcrypt.hash(password, 10);
         const result = await pool.query(
             'INSERT INTO users(email, password) VALUES($1,$2) RETURNING id',
             [email, hashed]
         );
 
         const token = jwt.sign({ id: result.rows[0].id }, SECRET);
-        res.json({ token });
+        res.status(201).json({ token });
     } catch {
         res.status(400).json({ message: 'User already exists' });
     }
@@ -74,67 +82,121 @@ app.post('/signup', async (req, res) => {
 
 // LOGIN
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    const result = await pool.query(
-        'SELECT * FROM users WHERE email=$1',
-        [email]
-    );
+    const email = req.body.email?.trim();
+    const password = req.body.password;
 
-    if (result.rows.length === 0) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+    if (!email || !password) return res.status(400).json({ message: 'Email and password required' });
+
+    try {
+        const result = await pool.query('SELECT * FROM users WHERE email=$1', [email]);
+        if (!result.rows.length) return res.status(401).json({ message: 'Invalid credentials' });
+
+        const user = result.rows[0];
+        const valid = await bcrypt.compare(password, user.password);
+        if (!valid) return res.status(401).json({ message: 'Invalid credentials' });
+
+        const token = jwt.sign({ id: user.id }, SECRET);
+        res.json({ token });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
     }
-
-    const user = result.rows[0];
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.sendStatus(401);
-
-    const token = jwt.sign({ id: user.id }, SECRET);
-    res.json({ token });
 });
 
 // GET ALL POSTS
 app.get('/posts', authenticateToken, async (req, res) => {
-    const result = await pool.query('SELECT * FROM posts ORDER BY created_at DESC');
-    res.json(result.rows);
+    try {
+        const result = await pool.query('SELECT * FROM posts ORDER BY created_at DESC');
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 // GET ONE POST
 app.get('/posts/:id', authenticateToken, async (req, res) => {
-    const result = await pool.query(
-        'SELECT * FROM posts WHERE id=$1',
-        [req.params.id]
-    );
-    res.json(result.rows[0]);
+    try {
+        const result = await pool.query('SELECT * FROM posts WHERE id=$1', [req.params.id]);
+        if (!result.rows.length) return res.status(404).json({ message: 'Post not found' });
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 // ADD POST
 app.post('/posts', authenticateToken, async (req, res) => {
-    await pool.query(
-        'INSERT INTO posts(body) VALUES($1)',
-        [req.body.body]
-    );
-    res.sendStatus(201);
+    const body = req.body.body?.trim();
+    if (!body) return res.status(400).json({ message: 'Post body required and cannot be empty' });
+
+    try {
+        const result = await pool.query('INSERT INTO posts(body) VALUES($1) RETURNING *', [body]);
+        res.status(201).json({ message: 'Post added', post: result.rows[0] });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 // UPDATE POST
 app.put('/posts/:id', authenticateToken, async (req, res) => {
-    await pool.query(
-        'UPDATE posts SET body=$1 WHERE id=$2',
-        [req.body.body, req.params.id]
-    );
-    res.sendStatus(200);
+    const body = req.body.body?.trim();
+    if (!body) return res.status(400).json({ message: 'Post body required and cannot be empty' });
+
+    try {
+        const result = await pool.query(
+            'UPDATE posts SET body=$1 WHERE id=$2 RETURNING *',
+            [body, req.params.id]
+        );
+        if (!result.rows.length) return res.status(404).json({ message: 'Post not found' });
+
+        res.json({ message: 'Post updated', post: result.rows[0] });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 // DELETE POST
 app.delete('/posts/:id', authenticateToken, async (req, res) => {
-    await pool.query('DELETE FROM posts WHERE id=$1', [req.params.id]);
-    res.sendStatus(200);
+    try {
+        const result = await pool.query('DELETE FROM posts WHERE id=$1 RETURNING *', [req.params.id]);
+        if (!result.rows.length) return res.status(404).json({ message: 'Post not found' });
+
+        res.json({ message: 'Post deleted', post: result.rows[0] });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 // DELETE ALL POSTS
 app.delete('/posts', authenticateToken, async (req, res) => {
-    await pool.query('DELETE FROM posts');
-    res.sendStatus(200);
+    try {
+        await pool.query('DELETE FROM posts');
+        res.json({ message: 'All posts deleted' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
+// Graceful shutdown
+async function shutdown() {
+    console.log('\nShutting down server...');
+    try {
+        await pool.end();
+        console.log('Database connections closed');
+        process.exit(0);
+    } catch (err) {
+        console.error('Error closing database connections:', err);
+        process.exit(1);
+    }
+}
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
+
+// Start server
 app.listen(3000, () => console.log('Backend running on port 3000'));
