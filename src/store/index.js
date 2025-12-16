@@ -32,13 +32,6 @@ export default createStore({
             }
         },
 
-        UNLIKE_ALL_POSTS(state) {
-            for (const post of state.posts) {
-                post.likes = 0;
-                post.isLiked = false;
-            }
-        },
-
         SET_TOKEN(state, token) {
             state.token = token;
             localStorage.setItem('token', token);
@@ -189,10 +182,6 @@ export default createStore({
 
         toggleLike({commit}, postId) {
             commit("TOGGLE_LIKE_BUTTON", postId)
-        },
-
-        unlikeAll({commit}) {
-            commit("UNLIKE_ALL_POSTS")
         },
 
         logout({commit}) {

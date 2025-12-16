@@ -13,8 +13,9 @@
       />
     </div>
   </div>
-  <div>
-    <button class="reset-likes" @click="resetLikes()"> Reset likes</button>
+  <div class="actions">
+    <button class="add-post" @click="addPost()"> Add Post</button>
+    <button class="delete-posts" @click="deletePosts()"> Delete All</button>
   </div>
 </template>
 
@@ -29,8 +30,12 @@ const router = useRouter()
 
 const allPosts = computed(() => store.getters.allPosts)
 
-function resetLikes() {
-  store.dispatch("unlikeAll")
+function addPost() {
+  router.push("/addpost")
+}
+
+function deletePosts() {
+  store.dispatch('deleteAllPosts')
 }
 
 function logout() {
@@ -56,17 +61,25 @@ onMounted(() => {
   padding: 15px 0;
 }
 
-.reset-likes {
-  background: #557798;
-  color: lightgray;
+.actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+}
+
+.add-post, .delete-posts {
+  margin-bottom: 15px;
+  padding: 8px 16px;
+  width: 100px;
+  background: #aeeea9;
+  color: black;
   border: none;
-  padding: 5px 10px;
-  margin-bottom: 2%;
-  border-radius: 15px;
+  border-radius: 10px;
   cursor: pointer;
 }
 
-.reset-likes:hover {
+.add-post:hover, .delete-posts:hover {
   background: #a6bbe4;
   color: black;
 }
