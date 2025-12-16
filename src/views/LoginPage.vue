@@ -41,32 +41,17 @@ export default {
     async login() {
       this.error = "";
 
-      try {
-        const response = await fetch("http://localhost:3000/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            email: this.email,
-            password: this.password
-          })
-        });
+      const success = await this.$store.dispatch('login', {
+        email: this.email,
+        password: this.password
+      });
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          this.error = data.message || "Login failed";
-          return;
-        }
-
-        // Save JWT
-        localStorage.setItem("token", data.token);
-
+      if (success) {
         // Redirect to protected home page
         this.$router.push("/");
-      } catch (err) {
-        this.error = "Server error. Please try again.";
+      } else {
+        // Error is set in store, get it from there
+        this.error = this.$store.getters.authError || "Login failed";
       }
     },
 

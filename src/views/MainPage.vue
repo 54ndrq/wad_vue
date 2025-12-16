@@ -31,7 +31,7 @@ function resetLikes() {
 }
 
 function logout() {
-  localStorage.removeItem("token")
+  store.dispatch("logout")
   router.push("/login")
 }
 
