@@ -2,6 +2,9 @@
   <div class="main-page">
     <h1>Welcome to PostIt</h1>
     <div class="post-container">
+      <button class="logout-btn" @click="logout">
+        Logout
+      </button>
       <post v-for="post in allPosts"
             :key="post.id"
             :post="post"/>
@@ -13,20 +16,28 @@
 </template>
 
 <script setup>
-import Post from "@/components/Post.vue";
-import {useStore} from "vuex";
-import {computed, onMounted} from "vue";
+import Post from "@/components/Post.vue"
+import { useStore } from "vuex"
+import { computed, onMounted } from "vue"
+import { useRouter } from "vue-router"
 
-const store = useStore();
-const allPosts = computed(() => store.getters.allPosts);
+const store = useStore()
+const router = useRouter()
+
+const allPosts = computed(() => store.getters.allPosts)
 
 function resetLikes() {
-  store.dispatch("unlikeAll");
+  store.dispatch("unlikeAll")
+}
+
+function logout() {
+  localStorage.removeItem("token")
+  router.push("/login")
 }
 
 onMounted(() => {
-  store.dispatch("fetchPosts");
-});
+  store.dispatch("fetchPosts")
+})
 </script>
 
 <style scoped>
@@ -51,6 +62,20 @@ onMounted(() => {
 .reset-likes:hover {
   background: #a6bbe4;
   color: black;
+}
+
+.logout-btn {
+  margin-bottom: 15px;
+  padding: 8px 16px;
+  background: #aeeea9;
+  color: black;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: #77b074;
 }
 
 @media (max-width: 768px) {

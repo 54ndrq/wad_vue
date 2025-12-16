@@ -35,38 +35,64 @@ export default {
     };
   },
 
-  methods: {
-    validatePassword() {
-      this.errors = [];
-      const pw = this.password;
+methods: {
+  async validatePassword() {
+    this.errors = [];
+    const pw = this.password;
 
-      // Rules
-      if (pw.length < 8 || pw.length > 14) {
-        this.errors.push("Password must be between 8 and 14 characters");
-      }
-      if (!/^[A-Z]/.test(pw)) {
-        this.errors.push("Password must start with an uppercase letter");
-      }
-      if ((pw.match(/[a-z]/g) || []).length < 2) {
-        this.errors.push("Password must contain at least two lowercase letters");
-      }
-      if (!/[0-9]/.test(pw)) {
-        this.errors.push("Password must include at least one number");
-      }
-      if (!pw.includes("_")) {
-        this.errors.push("Password must include the character '_'");
+    if (pw.length < 8 || pw.length > 14) {
+      this.errors.push("Password must be between 8 and 14 characters");
+    }
+    if (!/^[A-Z]/.test(pw)) {
+      this.errors.push("Password must start with an uppercase letter");
+    }
+    if ((pw.match(/[a-z]/g) || []).length < 2) {
+      this.errors.push("Password must contain at least two lowercase letters");
+    }
+    if (!/[0-9]/.test(pw)) {
+      this.errors.push("Password must include at least one number");
+    }
+    if (!pw.includes("_")) {
+      this.errors.push("Password must include the character '_'");
+    }
+
+    // if validation failed, stop here
+    if (this.errors.length > 0) {
+      this.password = "";
+      return;
+    }
+
+    // send data to backend
+    try {
+      const response = await fetch("http://localhost:3000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: this.email,
+          password: this.password
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        this.errors.push(data.message || "Signup failed");
+        return;
       }
 
-      if (this.errors.length > 0) {
-        this.password = '';
-      } else {
-        alert("Signup successful!");
-        //Clears the form
-        this.email = '';
-        this.password = '';
-      }
+      // save JWT
+      localStorage.setItem("token", data.token);
+
+      // redirect to login page
+      this.$router.push("/login");
+
+    } catch (error) {
+      this.errors.push("Server error. Please try again.");
     }
   }
+}
 };
 </script>
 
