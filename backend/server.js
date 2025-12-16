@@ -29,7 +29,6 @@ const pool = new Pool({
             CREATE TABLE IF NOT EXISTS users
             (
                 id SERIAL PRIMARY KEY,
-                username varchar(255) UNIQUE NOT NULL,
                 email TEXT UNIQUE NOT NULL,
                 password TEXT NOT NULL
             );
@@ -41,16 +40,9 @@ const pool = new Pool({
                 id SERIAL PRIMARY KEY,
                 body TEXT NOT NULL,
                 date varchar(255),
-                image varchar(255),
-                likes INT DEFAULT 0,
-                username varchar(255)
+                likes INT DEFAULT 0
             );
         `);
-
-        try {
-            await pool.query('ALTER TABLE posts ADD COLUMN IF NOT EXISTS username varchar(255)');
-        } catch (err) {
-        }
 
         console.log('Tables ready');
 
@@ -66,8 +58,8 @@ const pool = new Pool({
 
                 for (const post of posts) {
                     await pool.query(
-                        'INSERT INTO posts (body, date, image, likes, username) VALUES ($1, $2, $3, $4, $5)',
-                        [post.title, post.date, post.image, post.likes, post.username]
+                        'INSERT INTO posts (body, date, likes) VALUES ($1, $2, $3)',
+                        [post.title, post.date, post.likes]
                     );
                 }
                 console.log('Database seeded successfully!');
@@ -170,10 +162,9 @@ app.post('/posts', authenticateToken, async (req, res) => {
         year: 'numeric', month: 'short', day: 'numeric'
     })
 
-    const image = null;
     const likes = 0;
     try {
-        const result = await pool.query('INSERT INTO posts(body, date, image, likes) VALUES($1, $2, $3, $4) RETURNING *', [body, currentDate, image, likes]);
+        const result = await pool.query('INSERT INTO posts(body, date, likes) VALUES($1, $2, $3) RETURNING *', [body, currentDate, likes]);
         res.status(201).json({message: 'Post added', post: result.rows[0]});
     } catch (err) {
         console.error(err);

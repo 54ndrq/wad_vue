@@ -17,25 +17,23 @@ function handleLike() {
 </script>
 
 <template>
-  <div class="post">
+  <button class="post">
     <div v-if="post">
       <div class="user-info">
         <img alt="login_picture" class="profile-picture" src="@/assets/login.png">
-        <p class="username">{{ post.username }}</p>
         <p class="post-date"> {{ post.date }}</p>
       </div>
-      <img alt = "post_picture" v-if="post.image" :src="require(`@/assets/${post.image}`)" class="post-image">
       <div class="post-footer">
         <p class="post-comment">{{ post.title }}</p>
         <div class="like-section">
-          <button :class="{'liked':post.isLiked}" class="like-button" @click="handleLike">
+          <button :class="{'liked':post.isLiked}" class="like-button" @click.stop="handleLike">
             <img alt="Like" class="like-image" src="@/assets/like.png">
           </button>
           <p class="post-likes">{{ post.likes }} likes</p>
         </div>
       </div>
     </div>
-  </div>
+  </button>
 </template>
 
 <style scoped>
@@ -62,18 +60,8 @@ function handleLike() {
   border-radius: 50%;
 }
 
-.username {
-  font-weight: bold;
-}
-
 .post-date {
   margin-left: auto;
-}
-
-.post-image {
-  width: 100%;
-  border-radius: 10px;
-  max-height: 400px;
 }
 
 .post-footer {

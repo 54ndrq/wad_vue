@@ -3,6 +3,8 @@ import MainPage from '../views/MainPage.vue'
 import SignupPage from '@/views/SignupPage.vue'
 import LoginPage from '@/views/LoginPage.vue'
 import Contacts from "@/views/Contacts.vue";
+import APost from "@/views/APost.vue";
+import AddPost from "@/views/AddPost.vue";
 
 const routes = [
     {
@@ -25,7 +27,18 @@ const routes = [
         path: '/contacts',
         name: 'contacts',
         component: Contacts
-    }
+    },
+    {
+        path: '/post/:id',
+        name: 'apost',
+        component: APost,
+        meta: {requiresAuth: true}
+    },
+    {
+        path: '/addpost',
+        name: 'addpost',
+        component: AddPost
+    },
 ]
 
 const router = createRouter({

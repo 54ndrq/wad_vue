@@ -12,5 +12,7 @@
 </template>
 
 <style scoped>
-
+#contacts {
+  margin: 50px;
+}
 </style>

@@ -7,7 +7,10 @@
       </button>
       <post v-for="post in allPosts"
             :key="post.id"
-            :post="post"/>
+            :post="post"
+            class="clickable-post"
+            @click="goToPost(post.id)"
+      />
     </div>
   </div>
   <div>
@@ -17,9 +20,9 @@
 
 <script setup>
 import Post from "@/components/Post.vue"
-import { useStore } from "vuex"
-import { computed, onMounted } from "vue"
-import { useRouter } from "vue-router"
+import {useStore} from "vuex"
+import {computed, onMounted} from "vue"
+import {useRouter} from "vue-router"
 
 const store = useStore()
 const router = useRouter()
@@ -33,6 +36,10 @@ function resetLikes() {
 function logout() {
   store.dispatch("logout")
   router.push("/login")
+}
+
+function goToPost(id) {
+  router.push(`/post/${id}`)
 }
 
 onMounted(() => {
@@ -67,15 +74,25 @@ onMounted(() => {
 .logout-btn {
   margin-bottom: 15px;
   padding: 8px 16px;
+  align-self: center;
+  width: 100px;
   background: #aeeea9;
   color: black;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
 }
 
 .logout-btn:hover {
   background: #77b074;
+}
+
+.clickable-post {
+  cursor: pointer;
+}
+
+.clickable-post:hover {
+  opacity: 0.9;
 }
 
 @media (max-width: 768px) {

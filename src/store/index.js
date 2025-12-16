@@ -16,7 +16,6 @@ export default createStore({
             state.posts = posts.map(post => ({
                 ...post,
                 title: post.body || post.title || '', // Map body from API to title for component
-                username: post.username || 'Unknown User',
                 isLiked: false
             }));
         },
@@ -145,6 +144,41 @@ export default createStore({
                     },
                     body: JSON.stringify({body: bodyText})
                 });
+                if (res.ok) {
+                    dispatch('fetchPosts');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        },
+        async updatePost({state, dispatch}, {id, body}) {
+            try {
+                const res = await fetch(`http://localhost:3000/posts/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${state.token}`
+                    },
+                    body: JSON.stringify({body: body})
+                });
+
+                if (res.ok) {
+                    dispatch('fetchPosts');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        },
+
+        async deletePost({state, dispatch}, id) {
+            try {
+                const res = await fetch(`http://localhost:3000/posts/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${state.token}`
+                    }
+                });
+
                 if (res.ok) {
                     dispatch('fetchPosts');
                 }
